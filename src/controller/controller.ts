@@ -1,18 +1,21 @@
-import { Request,Response } from "express";
+import {  Request,Response } from "express";
 import { User} from "../service/user";
 import { Login} from "../service/login";
 
+
   export const creatUsers = async (req:Request, res:Response)=>{
     try{
-    const { name, email, password } = req.body;
+     const { name, email, password } = req.body;
      const user= new User(name, email, password)
      const newUser = await user.creatUser()
      res.status(200).send(newUser)
     
     }catch(err){
-     return res.status(500).send('falha ao criar um novo usuário')
-    }
-  };
+      const error = err as Error;
+      res.status(400).send(error.message)
+     };
+
+}
 
   export const signIn = async (req:Request, res:Response)=>{
     try{
@@ -20,22 +23,31 @@ import { Login} from "../service/login";
       const { email, password} = req.body;
       const login = new Login(email, password)
       const authenticate = await login.authenticateUser()
-      if(!authenticate) return res.status(400).json({ message: 'falhou' })
-      res.cookie('authToken', authenticate, { httpOnly: true }).json({ message: 'Autenticação bem-sucedida.' });
+      res.cookie('token', authenticate, { httpOnly: true }).json({ message: 'Autenticação bem-sucedida.' });
     
     }catch(err){
-      if (err instanceof TypeError) {
-        console.log('Erro do tipo TypeError:', err.message);
-        // Trate o erro TypeError de maneira específica, se necessário
-      }
-        //console.log(error);
-        // Trate o erro TypeError de maneira específica, se necessário
+      const error = err as Error;
+      res.status(400).json(error.message)
       
-       res.status(400).json(err)
+    
+       
     }
   };
 
-  
+  export const CheckToken = async (req:Request, res:Response)=>{
+    try{
+     console.log('oi')
+      res.send('deu')
+    }catch(err){
+      console.log(err)
+      res.send('flaha')
+  };
 
+}
+
+
+
+
+  //"carlosdaniiel286@gmail.com"
   
 
