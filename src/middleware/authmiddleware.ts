@@ -2,14 +2,21 @@ import { NextFunction,Request,Response } from "express";
 import { MeuErro } from "../service/login";
 import jwt, { JsonWebTokenError } from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { meuCache } from "../service/login";
 dotenv.config();
 
 type Token ={
     userId: number
+    name:string
 }
 
-export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
+type Id ={
+    id: number
+}
+
+export function authMiddleware( req:Request, res: Response, next: NextFunction): void {
   try{
+      
       const cookies =req.headers.cookie
       if(!cookies) throw new MeuErro('sem cookies')
       
@@ -19,8 +26,12 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
       
       const secretKey = process.env.SECRET_KEY as string;
       const verique = jwt.verify(token, secretKey) as Token
-     console.log(verique.userId)
-    
+      const valor = meuCache.get(token) as Id
+      if(valor.id!==verique.userId) throw new MeuErro('usuario invalido')
+     console.log(verique)
+      req.headers['user']=verique.userId.toString()
+      req.headers['name']=verique.name
+       
       next();
   }catch(err){
     console.log(err)
@@ -28,6 +39,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
      res.send('token invalido')
      return
     }
+    
     const error= err as Error
     res.send(error.message)
     }

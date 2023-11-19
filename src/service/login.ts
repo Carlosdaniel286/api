@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import prisma from '../database/prisma';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
+import NodeCache from 'node-cache';
 import { PrismaClientValidationError } from '@prisma/client/runtime/library';
 dotenv.config();
 
@@ -10,7 +11,7 @@ export class MeuErro extends Error {
       super(message);
     }
   }
-
+ export const meuCache = new NodeCache();
 export class Login {
     private email:string=''
     private password:string=''
@@ -21,11 +22,11 @@ export class Login {
      
     }
 
-    async generateToken(userId:string){
+    async generateToken(userId:string,name:string){
         try{
             const secretKey = process.env.SECRET_KEY as string;
             const expiresIn = '1h'; // Pode ajustar o tempo de expiração
-            const token = jwt.sign({ userId }, secretKey, { expiresIn });
+            const token = jwt.sign({ userId,name }, secretKey, { expiresIn });
             return token;
         }catch(err){
             console.log(err)
@@ -35,6 +36,7 @@ export class Login {
 
     async authenticateUser (){
     try{
+        
         if(typeof this.password!=='string') throw new MeuErro('erro de tipo, senha deve conter caracters')
         const user = await prisma.user.findUnique({ where: { email:this.email } })
         
@@ -43,9 +45,12 @@ export class Login {
         
         if(!authenticated) throw new MeuErro('senha incorreta')
          
-        const token = await this.generateToken(user.id.toString())
+        const token = await this.generateToken(user.id.toString(),user.name)
         
          if(!token)  throw new MeuErro('erro na geraçao de token')
+          const indtifqueUser ={id:user.id.toString()}
+
+         meuCache.set(token, indtifqueUser, 2 * 60 * 60);
         return token
     
     }catch(err){
@@ -67,4 +72,3 @@ export class Login {
     }
 }
 }
-//"carlosdaniiel286@gmail.com"
