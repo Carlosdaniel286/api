@@ -1,3 +1,4 @@
+import prisma from "../database/prisma"
 
 
 
@@ -12,24 +13,19 @@ export class Comments {
     this.idPost =idPost
     
    }
-     async getIdpost(){
-      return this.idPost
-     }
-
-     async getAuthor(){
-      return this.author
-     }
-
-     async getComment(){
-      return this.comment
-     }
-
-
-      geTOString(){
+   async setComments() {
+    const comments = new Comments(this.author, this.comment, this.idPost);
+    const novoPost = await prisma.comment.create({
+        data:comments.geComments()
+      })
+  console.log(novoPost)
+ 
+}
+geComments(){
        const data={
-        author:this.author,
-        comment:this.comment,
-        idPost:this.idPost
+           author:this.author,
+           comment:this.comment,
+           idPost:this.idPost
         } 
         return data
       

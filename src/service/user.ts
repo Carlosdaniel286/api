@@ -6,7 +6,7 @@ export class User {
     private name:string =''
     private email:string =''
     private password:string =''
-
+    
     constructor(name:string,email:string,passworld:string){
         this.email =email
         this.name =name

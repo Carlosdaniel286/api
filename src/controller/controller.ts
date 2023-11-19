@@ -34,16 +34,7 @@ import { Login} from "../service/login";
     }
   };
 
-  export const CheckToken = async (req:Request, res:Response)=>{
-    try{
-      const id = req.headers.user
-      res.send('flaha')
-    }catch(err){
-      console.log(err)
-      res.send('flaha')
-  };
-
-}
+  
 
 
 
