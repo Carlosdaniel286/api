@@ -1,5 +1,10 @@
-import prisma from "../database/prisma"
 
+import prisma from "../database/prisma"
+export type newcomments={
+   idPost:number
+   author:string
+  comment:string
+}
 
 
 export class Comments {
@@ -18,7 +23,7 @@ export class Comments {
     const novoPost = await prisma.comment.create({
         data:comments.geComments()
       })
-  console.log(novoPost)
+ 
  
 }
 geComments(){

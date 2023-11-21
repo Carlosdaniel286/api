@@ -1,33 +1,33 @@
-import { Comments } from "./comments";
 import { MeuErro } from "./login";
 import prisma from '../database/prisma';
+import { newcomments } from "./comments";
 
 type obj = {
   author: string;
-  comment: string;
+  comment?: newcomments[];
+  content:string
+  id:number
 };
 
 export class Publication {
-  private  id = 0;
   private  idUser=0
   private  author = '';
-  private  post = '';
-  private  comments: obj[] = [];
+  private  content = '';
+  private post!: obj;
  
-  constructor(author: string, post: string,idUser:number){
-    this.post=post,
+  
+  constructor(author: string, content: string,idUser:number){
+    this.content=content,
     this.author=author
     this.idUser=idUser
   }
   
 
    async setPublication() {
-    if (this.post === '') throw new MeuErro('sem posts');
-    
-   
-    const novoPost = await prisma.post.create({
+    if (this.content === '') throw new MeuErro('sem posts');
+      const novoPost = await prisma.post.create({
         data: {
-          post:this.post,
+          content:this.content,
           author:this.author,
           idUser:this.idUser
         },
@@ -35,25 +35,18 @@ export class Publication {
           comments: true,
         },
       });
-      this.author = novoPost.author;
-      this.post = novoPost.post;
-      this.comments = [];
-      this.idUser=novoPost.idUser
-      this.id =novoPost.id
-
-      console.log(novoPost)
+    
+    this.post={
+      author: novoPost.author,
+      content:novoPost.content,
+      id:novoPost.id,
+     
+      }
    }
 
  
    async getPublication() {
-    return {
-      idUser:this.idUser,
-      id:this.id,
-      author: this.author,
-      post: this.post,
-      comments: this.comments,
-      
-    };
+    return this.post
   }
 
   static async Feed(id:number) {

@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -30,7 +30,7 @@ model Comment {
 model Post {
   id       Int      @id @default(autoincrement())
   author   String
-  post     String
+  content     String
   idUser   Int
   user     User     @relation(fields: [idUser], references: [id])
   comments Comment[]  
